@@ -47,9 +47,9 @@ torch.manual_seed(random_seed)
 torch.cuda.manual_seed_all(random_seed) #为gpu提供随机数
 
 
-train_dataset = datasets.MNIST(root='./dataset/mnist/', train=True, download=False, transform=train_transform)
+train_dataset = datasets.MNIST(root='./dataset/mnist/', train=True, download=True, transform=train_transform)
 
-test_dataset = datasets.MNIST(root='./dataset/mnist/', train=False, download=False, transform=test_transform)
+test_dataset = datasets.MNIST(root='./dataset/mnist/', train=False, download=True, transform=test_transform)
 #将数据存储在cuda固定内存中，提高数据的存储速度
 train_loader = DataLoader(dataset=train_dataset,batch_size=train_batch_size,shuffle=True,pin_memory=True)
 test_loader = DataLoader(dataset=test_dataset,batch_size=test_batch_size,shuffle=False,pin_memory=True)
@@ -221,14 +221,16 @@ temp_acc = 0.0
 train_loss_val = []
 now = datetime.datetime.now()
 print(now.strftime('%Y/%m/%d %H:%M:%S'))
-for epoch in range(1):
-    # train(epoch)
+for epoch in range(20):
+    train(epoch)
     acc = test()
-    # print(epoch,acc)
+    print(epoch,acc)
     train_epoch.append(epoch)
+    model_accuracy.append(acc)
     # acc = model_accuracy.append(acc)
+    # print(acc)
     
-    # writer.add_scalar('Accuracy',acc,epoch+1)
+    writer.add_scalar('Accuracy',acc,epoch+1)
     now = datetime.datetime.now()
     print(now.strftime('%Y/%m/%d %H:%M:%S'),"Accuracy:%f "% (acc))
 
@@ -241,8 +243,8 @@ writer.add_graph(model, (graph_inputs,))
 writer.close()
 torch.cuda.empty_cache()        #释放显存
 
-# plt.plot(train_epoch, model_accuracy)  # 传入列表，plt类用来画图
-# plt.grid(linestyle=':')
-# plt.ylabel('accuracy')  # 定义y坐标轴的名字
-# plt.xlabel('epoch')  # 定义x坐标
-# plt.show()  # 显示
+plt.plot(train_epoch, model_accuracy)  # 传入列表，plt类用来画图
+plt.grid(linestyle=':')
+plt.ylabel('accuracy')  # 定义y坐标轴的名字
+plt.xlabel('epoch')  # 定义x坐标
+plt.show()  # 显示
