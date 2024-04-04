@@ -47,9 +47,9 @@ torch.manual_seed(random_seed)
 torch.cuda.manual_seed_all(random_seed) #为gpu提供随机数
 
 
-train_dataset = datasets.MNIST(root='./dataset/mnist/', train=True, download=True, transform=train_transform)
+train_dataset = datasets.MNIST(root='../../Dataset/mnist/', train=True, download=True, transform=train_transform)
 
-test_dataset = datasets.MNIST(root='./dataset/mnist/', train=False, download=True, transform=test_transform)
+test_dataset = datasets.MNIST(root='../../Dataset/mnist/', train=False, download=True, transform=test_transform)
 #将数据存储在cuda固定内存中，提高数据的存储速度
 train_loader = DataLoader(dataset=train_dataset,batch_size=train_batch_size,shuffle=True,pin_memory=True)
 test_loader = DataLoader(dataset=test_dataset,batch_size=test_batch_size,shuffle=False,pin_memory=True)
@@ -179,8 +179,9 @@ scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0
 
 #把训练封装成一个函数
 def train(epoch):
-    running_loss =0.0
+    running_loss = 0.0
     for batch_idx,data in enumerate(train_loader,0):
+        # print(batch_idx)
         inputs,target = data
         inputs,target = inputs.to(device),target.to(device)
         optimizer.zero_grad()
@@ -192,11 +193,9 @@ def train(epoch):
         optimizer.step()
 
         running_loss+=loss.item()
-        # if batch_idx%300==299:
         train_loss_val.append((running_loss))
-            #print('[%d,%5d] loss:%3f'%(epoch+1,batch_idx+1,running_loss/300))
-        # writer.add_scalar('Loss',running_loss,int((epoch-1)*50000/train_batch_size)+batch_idx)
-            # print('[%d, %5d] loss: %.3f' % (epoch + 1, batch_idx + 1, running_loss / 300))
+        if batch_idx%20==19:
+            print('[Epoch: %d, batch: %5d] loss: %3f'%(epoch+1,batch_idx+1,running_loss/20))
         running_loss = 0.0
     return running_loss / 300
 
@@ -215,32 +214,32 @@ def test():
 
     return correct/total
 
-train_epoch= []
+train_epoch = []
 model_accuracy = []
 temp_acc = 0.0
 train_loss_val = []
 now = datetime.datetime.now()
-print(now.strftime('%Y/%m/%d %H:%M:%S'))
+print(now.strftime('%Y/%m/%d %H:%M:%S\n'))
 for epoch in range(20):
     train(epoch)
     acc = test()
-    print(epoch,acc)
+    print('Epoch: %d, Accuracy: %f' % (epoch, acc))
     train_epoch.append(epoch)
     model_accuracy.append(acc)
     # acc = model_accuracy.append(acc)
     # print(acc)
     
-    writer.add_scalar('Accuracy',acc,epoch+1)
+    # writer.add_scalar('Accuracy',acc,epoch+1)
     now = datetime.datetime.now()
-    print(now.strftime('%Y/%m/%d %H:%M:%S'),"Accuracy:%f "% (acc))
+    print(now.strftime('%Y/%m/%d %H:%M:%S'),"Accuracy:%f \n"% (acc))
 
 if torch.cuda.is_available():
     graph_inputs = torch.from_numpy(np.random.rand(1,1,28,28)).type(torch.FloatTensor).cuda()
 else:
     graph_inputs = torch.from_numpy(np.random.rand(1,1,28,28)).type(torch.FloatTensor)
-writer.add_graph(model, (graph_inputs,))
+# writer.add_graph(model, (graph_inputs,))
 
-writer.close()
+# writer.close()
 torch.cuda.empty_cache()        #释放显存
 
 plt.plot(train_epoch, model_accuracy)  # 传入列表，plt类用来画图
