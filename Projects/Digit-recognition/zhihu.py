@@ -73,8 +73,8 @@ def train(epoch):
                                                                            loss.item()))
             train_losses.append(loss.item())
             train_counter.append((batch_idx * 64) + ((epoch - 1) * len(train_loader.dataset)))
-            torch.save(network.state_dict(), './model.pth')
-            torch.save(optimizer.state_dict(), './optimizer.pth')
+            torch.save(network.state_dict(), './caches/model.pth')
+            torch.save(optimizer.state_dict(), './caches/optimizer.pth')
  
 def test():
     network.eval()
@@ -129,9 +129,9 @@ plt.show()
 continued_network = Net()
 continued_optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
  
-network_state_dict = torch.load('model.pth')
+network_state_dict = torch.load('./caches/model.pth')
 continued_network.load_state_dict(network_state_dict)
-optimizer_state_dict = torch.load('optimizer.pth')
+optimizer_state_dict = torch.load('./caches/optimizer.pth')
 continued_optimizer.load_state_dict(optimizer_state_dict)
  
 # 注意不要注释前面的“for epoch in range(1, n_epochs + 1):”部分，
