@@ -1,23 +1,12 @@
 import torch
 import torchvision
-from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import matplotlib.pyplot as plt
-import sklearn
 import argparse
-from net import Net, Vanilla_Net
+from net import *
 from utils.dataloader import LoadData
- 
-n_epochs = 4
-batch_size_train = 64
-batch_size_test = 1000
-learning_rate = 0.01
-momentum = 0.5
-log_interval = 10
-random_seed = 1
-torch.manual_seed(random_seed)
 
 train_losses = []
 train_counter = []
@@ -38,8 +27,8 @@ def train(epoch):
                                                                            loss.item()))
             train_losses.append(loss.item())
             train_counter.append((batch_idx * 64) + ((max(0, epoch - 1)) * len(train_loader.dataset)))
-            torch.save(network.state_dict(), './caches/model.pth')
-            torch.save(optimizer.state_dict(), './caches/optimizer.pth')
+            torch.save(network.state_dict(), './caches/' + method + '_model.pth')
+            torch.save(network.state_dict(), './caches/' + method + '_optimizer.pth')
 
 def test():
     network.eval()
@@ -66,8 +55,19 @@ if __name__ == '__main__':
     parser.add_argument('--momentum', type=float, default=0.5, metavar='M', help='SGD momentum (default: 0.5)')
     parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N', help='how many batches to wait before logging training status')
-    parser.add_argument('--method', type=str, default='vanilla', metavar='M', help='which method to use (default: vanilla)')
+    parser.add_argument('--method', type=str, default='res_cnn', metavar='M', help='which method to use "vanilla_cnn, res_cnn, vanilla_transformer" (default: vanilla)')
     parser.add_argument('--train', type=bool, default=True, metavar='T', help='whether to train the model (default: True)')
+    parser.add_argument('--data_path', type=str, default='../../Dataset/mnist/', metavar='D', help='data path (default: ../../Dataset/mnist/)')
+
+    # Transformer (if method is vanilla_transformer)
+    parser.add_argument('--n_channels', type=int, default=1, help='number of input channels')
+    parser.add_argument("--embed_dim", type=int, default=64, help="dimensionality of the latent space")
+    parser.add_argument("--n_attention_heads", type=int, default=4, help="number of heads to be used")
+    parser.add_argument("--forward_mul", type=int, default=2, help="forward multiplier")
+    parser.add_argument("--n_layers", type=int, default=6, help="number of encoder layers")
+    parser.add_argument("--image_size", type=int, default=28, help="image size")
+    parser.add_argument("--patch_size", type=int, default=4, help="patch size")
+    parser.add_argument("--n_classes", type=int, default=10, help="number of classes")
 
     args = parser.parse_args()
     batch_size_train = args.batch_size
@@ -79,18 +79,42 @@ if __name__ == '__main__':
     log_interval = args.log_interval
     method = args.method
     train_flag = args.train
+    data_path = args.data_path
 
-    if method == 'vanilla':
-        net = Vanilla_Net()
-    elif method == 'resnet':
-        net = Net()
-    elif method == 'ml':
-        net = sklearn.linear_model.LogisticRegression()
+    print('--------------------------------------')
+    print('batch_size_train: ', batch_size_train)
+    print('batch_size_test: ', batch_size_test)
+    print('n_epochs: ', n_epochs)
+    print('learning_rate: ', learning_rate)
+    print('momentum: ', momentum)
+    print('random_seed: ', random_seed)
+    print('log_interval: ', log_interval)
+    print('method: ', method)
+    print('data_path: ', data_path)
+    print('--------------------------------------')
+
+    if method == 'vanilla_cnn':
+        net = Vanilla_CNN()
+    elif method == 'res_cnn':
+        net = ResCNN()
+    elif method == 'vanilla_transformer':
+        n_channels = args.n_channels
+        embed_dim = args.embed_dim
+        n_layers = args.n_layers
+        n_attention_heads = args.n_attention_heads 
+        forward_mul = args.forward_mul
+        image_size = args.image_size
+        patch_size = args.patch_size
+        n_classes = args.n_classes
+
+        net = Vanilla_Transformer(n_channels, embed_dim, n_layers, n_attention_heads, forward_mul, image_size, patch_size, n_classes)
+    else:
+        raise ValueError('Method not found! (vanilla_cnn, res_cnn, vanilla_transformer)')
     
     # ----------------------------------------------------------- #
     # load data
     # ----------------------------------------------------------- #
-    train_loader, test_loader = LoadData('../../Dataset/mnist/', batch_size_train, batch_size_test)
+    train_loader, test_loader = LoadData(data_path, batch_size_train, batch_size_test)
     examples = enumerate(test_loader)
     batch_idx, (example_data, example_targets) = next(examples)
     test_counter = [i * len(train_loader.dataset) for i in range(n_epochs + 1)]
@@ -112,12 +136,14 @@ if __name__ == '__main__':
     # ----------------------------------------------------------- #
     continued_network = net
     continued_optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
-    
-    network_state_dict = torch.load('./caches/model.pth')
+    network_state_dict = torch.load('./caches/' + method + '_model.pth')
     continued_network.load_state_dict(network_state_dict)
-    optimizer_state_dict = torch.load('./caches/optimizer.pth')
+    optimizer_state_dict = torch.load('./caches/' + method + '_optimizer.pth')
     continued_optimizer.load_state_dict(optimizer_state_dict)
     
+    #-----------------------------------------------------------#
+    # visualize
+    #-----------------------------------------------------------#
     fig = plt.figure()
     plt.plot(train_counter, train_losses, color='blue')
     plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
