@@ -2,11 +2,20 @@
 
 ## 1. 项目简介
 
-本项目是基于 Mnist 数据集的手写数字识别，使用了深度学习的方法，通过搭建卷积神经网络模型，对手写数字进行识别。项目使用 Python 语言，主要使用了 PyTorch 框架，通过对 Mnist 数据集的训练，实现了对手写数字的识别。
+本项目是基于 Mnist 数据集的手写数字识别，使用了深度学习和机器学习方法，通过搭建卷积神经网络模型，对手写数字进行识别。项目使用 Python 语言，主要使用了 PyTorch 框架，通过对 Mnist 数据集的训练，实现了对手写数字的识别。
 
 ## 2. 模型结构
 
-本项目使用了卷积神经网络模型，模型结构如下：
+本项目实现了 3 种机器学习方法和 3 种深度学习方法，分别是：
+
+- 机器学习方法：
+  - KNN
+  - SVM
+  - Random Forest
+- 深度学习方法：
+  - Vanilla CNN
+  - Residual CNN
+  - Vision Transformer
 
 ## 3. 数据集
 
@@ -14,7 +23,29 @@
 
 ### 3.1 数据预处理
 
-在训练模型之前，需要对数据进行预处理，主要包括数据加载、数据预处理、数据增强等步骤。在本项目中，使用了 PyTorch 框架自带的数据加载模块，对 Mnist 数据集进行加载，并进行了数据预处理，包括数据归一化、数据增强等操作。
+在训练模型之前，需要对数据进行预处理，主要包括数据加载、数据预处理、数据增强等步骤。本项目使用 PyyTorch 框架自带的数据加载模块，对 Mnist 数据集进行加载，并进行了数据预处理，包括数据归一化、数据增强等操作。
+
+```python
+def LoadData(path, batch_size_train, batch_size_test):
+    train_loader = torch.utils.data.DataLoader(
+        torchvision.datasets.MNIST(path, train=True, download=True,
+                                transform=torchvision.transforms.Compose([
+                                    torchvision.transforms.ToTensor(),
+                                    torchvision.transforms.Normalize(
+                                        (0.1307,), (0.3081,))
+                                ])),
+        batch_size=batch_size_train, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(
+        torchvision.datasets.MNIST(path, train=False, download=True,
+                                transform=torchvision.transforms.Compose([
+                                    torchvision.transforms.ToTensor(),
+                                    torchvision.transforms.Normalize(
+                                        (0.1307,), (0.3081,))
+                                ])),
+        batch_size=batch_size_test, shuffle=True)
+
+    return train_loader, test_loader
+```
 
 ## 4. 模型训练
 
@@ -35,23 +66,19 @@
 ```
 Digit-recognition/
 │
-├── data/                   # 数据集
+├── ../../Dataset/                   # 数据集
 │   ├── mnist/              # Mnist数据集
-│   │   ├── train/          # 训练集
-│   │   ├── test/           # 测试集
 │
 ├── model/                  # 模型
-│   ├── cnn_model.py        # 卷积神经网络模型
+│   ├── net.py        # 深度学习模型
 │
 ├── utils/                  # 工具
 │   ├── data_loader.py      # 数据加载
-│   ├── data_preprocess.py  # 数据预处理
-│   ├── evaluate.py         # 模型评估
 │
-├── train.py                # 模型训练
-├── test.py                 # 模型测试
-├── deploy.py               # 模型部署
-├── app.py                  # Web应用
+├── caches/                 # 模型权重文件
+│
+├── demo.py                 # 深度学习方法
+├── ml.py                   # 机器学习方法
 ├── README.md               # 项目说明
 ```
 
@@ -61,40 +88,49 @@ Digit-recognition/
 
 - Python 3.x
 - PyTorch
-- Flask
 - Numpy
 - Matplotlib
+- sklearn
 
 ### 8.2 运行步骤
 
-1. 数据预处理
+1. 机器学习方法
+
+1.1 训练
 
 ```
-python data_preprocess.py
+python ml.py --method=svm --save_path='/caches/' --train=True
 ```
 
-2. 模型训练
+1.2 测试
 
 ```
-python train.py
+python ml.py --method=svm --save_path='/caches/' --train=False
 ```
 
-3. 模型评估
+2. 深度学习方法
+
+2.1 训练
 
 ```
-python evaluate.py
+python demo.py --method=vanilla_cnn --save_path='/caches/' --train=True --epochs=10
 ```
 
-4. 模型部署
+2.2 测试
 
 ```
-python deploy.py
+python demo.py --method=vanilla_cnn --save_path='/caches/' --train=False
 ```
 
-5. 启动 Web 应用
+## 9. 量化评估
 
-```
-python app.py
-```
+本项目对比了 3 种机器学习方法 (SVM, KNN, Random Forest) 和 3 种深度学习方法 (Vanilla CNN, Residual CNN, Vision Transformer) 的性能，通过对 Mnist 数据集的训练和测试，计算了模型的准确率, 评估了模型的性能。通过对比不同方法的性能，可以了解不同方法的优劣，选择合适的方法进行手写数字识别。 下表为不同方法的性能对比：
 
-6. 在浏览器中输入`http://localhost:5000`，上传手写数字图片，查看识别结果。
+| 方法               | 准确率 | 收敛轮数 |
+| ------------------ | ------ | -------- |
+| SVM                | 0.98   | 10       |
+| KNN                | 0.97   | 10       |
+| Random Forest      | 0.96   | 10       |
+| Vanilla CNN        | 0.99   | 10       |
+| Residual CNN       | 0.98   | 10       |
+| Vision Transformer | 0.97   | 10       |

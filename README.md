@@ -4,7 +4,7 @@ Course projects of the deep learning of UCAS.
 
 ## 1. Introduction
 
-This repository contains the course projects of the deep learning of UCAS. The projects are implemented using PyTorch and TensorFlow.
+This repository contains the course projects of the deep learning of UCAS. The projects are implemented using PyTorch.
 
 ## 2. Projects
 
