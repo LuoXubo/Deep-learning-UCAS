@@ -135,11 +135,9 @@ if __name__ == '__main__':
     # test
     # ----------------------------------------------------------- #
     continued_network = net
-    continued_optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
     network_state_dict = torch.load('./caches/' + method + '_model.pth')
     continued_network.load_state_dict(network_state_dict)
-    optimizer_state_dict = torch.load('./caches/' + method + '_optimizer.pth')
-    continued_optimizer.load_state_dict(optimizer_state_dict)
+
     
     #-----------------------------------------------------------#
     # visualize
@@ -154,7 +152,7 @@ if __name__ == '__main__':
     examples = enumerate(test_loader)
     batch_idx, (example_data, example_targets) = next(examples)
     with torch.no_grad():
-        output = network(example_data)
+        output = continued_network(example_data)
     fig = plt.figure()
     for i in range(6):
         plt.subplot(2, 3, i + 1)
