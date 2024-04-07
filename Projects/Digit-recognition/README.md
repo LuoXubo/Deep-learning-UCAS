@@ -116,6 +116,10 @@ python ml.py --method=svm --save_path='/caches/' --train=False
 python demo.py --method=vanilla_cnn --save_path='/caches/' --train=True --epochs=10
 ```
 
+![vanilla CNN](./figs/vanilla_cnn.png)
+![residual CNN](./figs/Figure_1.png)
+![vision transformer](./figs/transformer.png)
+
 2.2 测试
 
 ```
@@ -128,9 +132,9 @@ python demo.py --method=vanilla_cnn --save_path='/caches/' --train=False
 
 | 方法               | 准确率 | 收敛轮数 |
 | ------------------ | ------ | -------- |
-| SVM                | 0.98   | 10       |
-| KNN                | 0.97   | 10       |
-| Random Forest      | 0.96   | 10       |
+| SVM                | 0.9426 | -        |
+| KNN                | 0.9759 | -        |
+| Random Forest      | 0.9722 | -        |
 | Vanilla CNN        | 0.99   | 10       |
 | Residual CNN       | 0.98   | 10       |
 | Vision Transformer | 0.97   | 10       |

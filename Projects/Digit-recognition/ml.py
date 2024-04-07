@@ -12,7 +12,8 @@ from sklearn import metrics
 from sklearn import svm
 from sklearn import neighbors
 from sklearn import ensemble
-from sklearn.externals import joblib
+# from sklearn.externals import joblib
+import joblib
 import argparse
 
 if __name__ == '__main__':
