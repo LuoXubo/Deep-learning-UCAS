@@ -116,8 +116,13 @@ python ml.py --method=svm --save_path='/caches/' --train=False
 python demo.py --method=vanilla_cnn --save_path='/caches/' --train=True --epochs=10
 ```
 
+Vanilla CNN
 ![vanilla CNN](./figs/vanilla_cnn.png)
-![residual CNN](./figs/Figure_1.png)
+
+Residual CNN
+![residual CNN](./figs/residual_cnn.png)
+
+Vision Transformer
 ![vision transformer](./figs/transformer.png)
 
 2.2 测试

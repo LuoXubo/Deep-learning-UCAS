@@ -8,6 +8,9 @@ import argparse
 from net import *
 from utils.dataloader import LoadData
 
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 train_losses = []
 train_counter = []
 test_losses = []
@@ -16,7 +19,9 @@ def train(epoch):
     network.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
+        data = data.to(device)
         output = network(data)
+        output = output.to('cpu')
         loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
@@ -31,12 +36,14 @@ def train(epoch):
             torch.save(network.state_dict(), './caches/' + method + '_optimizer.pth')
 
 def test():
-    network.eval()
+    continued_network.eval()
     test_loss = 0
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
-            output = network(data)
+            data = data.to(device)
+            output = continued_network(data)
+            output = output.to('cpu')
             test_loss += F.nll_loss(output, target, reduction='sum').item()
             pred = output.data.max(1, keepdim=True)[1]
             correct += pred.eq(target.data.view_as(pred)).sum()
@@ -125,9 +132,13 @@ if __name__ == '__main__':
     # ----------------------------------------------------------- #
     if train_flag:
         network = net
+        network.to(device)
         optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
         for epoch in range(1, n_epochs + 1):
             train(epoch)
+            continued_network = net
+            network_state_dict = torch.load('./caches/' + method + '_model.pth')
+            continued_network.load_state_dict(network_state_dict)
             test()
     
     
@@ -137,8 +148,9 @@ if __name__ == '__main__':
     continued_network = net
     network_state_dict = torch.load('./caches/' + method + '_model.pth')
     continued_network.load_state_dict(network_state_dict)
+    test()
 
-    
+
     #-----------------------------------------------------------#
     # visualize
     #-----------------------------------------------------------#
@@ -152,7 +164,9 @@ if __name__ == '__main__':
     examples = enumerate(test_loader)
     batch_idx, (example_data, example_targets) = next(examples)
     with torch.no_grad():
+        example_data = example_data.to(device)
         output = continued_network(example_data)
+        output = output.to('cpu')
     fig = plt.figure()
     for i in range(6):
         plt.subplot(2, 3, i + 1)
