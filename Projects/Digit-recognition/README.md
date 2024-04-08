@@ -110,8 +110,9 @@ Vanilla CNN, Residual CNN, Vision Transformer 的训练日志：
 
 <center>
 <figure>
-<img src="./figs/vanilla_cnn.png" width=120 /> <img src="./figs/residual_cnn.png" width=120 />
-<img src="./figs/transformer.png" width=120/>
+<img src="./figs/vanilla_cnn.png" width=33% /> 
+<img src="./figs/residual_cnn.png" width=33% />
+<img src="./figs/transformer.png" width=33%/>
 </figure>
 </center>
 
