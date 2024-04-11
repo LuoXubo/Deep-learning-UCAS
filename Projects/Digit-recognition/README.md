@@ -134,5 +134,5 @@ python demo.py --method=[METHOD] --save_path='/caches/' --train=False
 | KNN                | 0.9759 | -        |
 | Random Forest      | 0.9722 | -        |
 | Vanilla CNN        | 0.99   | 10       |
-| Residual CNN       | 0.98   | 10       |
+| Residual CNN       | 0.9930 | 10       |
 | Vision Transformer | 0.97   | 10       |
