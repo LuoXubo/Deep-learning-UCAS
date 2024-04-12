@@ -63,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N', help='how many batches to wait before logging training status')
     parser.add_argument('--method', type=str, default='res_cnn', metavar='M', help='which method to use "vanilla_cnn, res_cnn, vanilla_transformer" (default: vanilla)')
-    parser.add_argument('--train', type=bool, default=True, metavar='T', help='whether to train the model (default: True)')
+    parser.add_argument('--train', type=int, default=1, metavar='T', help='whether to train the model (0: False, 1: True)')
     parser.add_argument('--data_path', type=str, default='../../Dataset/mnist/', metavar='D', help='data path (default: ../../Dataset/mnist/)')
 
     # Transformer (if method is vanilla_transformer)
@@ -146,6 +146,7 @@ if __name__ == '__main__':
     # test
     # ----------------------------------------------------------- #
     continued_network = net
+    continued_network.to(device)
     network_state_dict = torch.load('./caches/' + method + '_model.pth')
     continued_network.load_state_dict(network_state_dict)
     test()
@@ -154,12 +155,13 @@ if __name__ == '__main__':
     #-----------------------------------------------------------#
     # visualize
     #-----------------------------------------------------------#
-    fig = plt.figure()
-    plt.plot(train_counter, train_losses, color='blue')
-    plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-    plt.xlabel('number of training examples seen')
-    plt.ylabel('negative log likelihood loss')
-    plt.show()
+    if train_flag:
+        fig = plt.figure()
+        plt.plot(train_counter, train_losses, color='blue')
+        plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
+        plt.xlabel('number of training examples seen')
+        plt.ylabel('negative log likelihood loss')
+        plt.show()
 
     examples = enumerate(test_loader)
     batch_idx, (example_data, example_targets) = next(examples)
@@ -167,6 +169,7 @@ if __name__ == '__main__':
         example_data = example_data.to(device)
         output = continued_network(example_data)
         output = output.to('cpu')
+    example_data = example_data.to('cpu')
     fig = plt.figure()
     for i in range(6):
         plt.subplot(2, 3, i + 1)
