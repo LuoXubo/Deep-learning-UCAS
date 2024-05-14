@@ -21,8 +21,8 @@ def train_fn(model, data_loader, optimizer, device):
         loss.backward()
 
         optimizer.step()
-        if batch_idx % 100 == 0:
-            print(f"Batch {batch_idx} Loss: {loss.item()}")
+        # if batch_idx % 100 == 0:
+        #     print(f"Batch {batch_idx} Loss: {loss.item()}")
 
 
 def eval_fn(model, data_loader, device):
@@ -93,7 +93,7 @@ def main():
 
     # train model
     optimizer = torch.optim.Adam(model.parameters())
-    for epoch in range(10):
+    for epoch in range(200):
         train_fn(model, train_loader, optimizer, device)
         outputs, targets = eval_fn(model, test_loader, device)
         outputs = torch.tensor(outputs)
@@ -102,7 +102,8 @@ def main():
         print(f"Epoch {epoch} Accuracy: {accuracy}")
 
         # save model
-        torch.save(model.state_dict(), f"caches/vit_{epoch}.bin")
+        if epoch % 10 == 0:
+            torch.save(model.state_dict(), f"caches/vit_{epoch}.bin")
         
 
 

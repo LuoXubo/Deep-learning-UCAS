@@ -30,6 +30,12 @@ To evaluate the model, run the following command:
 python evaluate.py
 ```
 
+# Results
+
+| Model       | Accuracy (200 epochs) |
+| ----------- | --------------------- |
+| ViT patch=4 | 98.5%                 |
+
 ## References
 
 1. [Vision Transformer (ViT)](https://arxiv.org/abs/2010.11929)
