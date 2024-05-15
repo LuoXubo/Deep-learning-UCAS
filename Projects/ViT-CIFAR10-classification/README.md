@@ -35,7 +35,8 @@ python evaluate.py
 | Model        | Accuracy (400 epochs) |
 | ------------ | --------------------- |
 | ViT(patch=4) | 84.46%                |
-| ResNet18     |                       |
+| ResNet18     | 93.87%                |
+| ViT_tiny     | 94.00%                |
 
 ## References
 
