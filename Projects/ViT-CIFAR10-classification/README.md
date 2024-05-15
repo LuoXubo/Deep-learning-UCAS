@@ -32,9 +32,10 @@ python evaluate.py
 
 # Results
 
-| Model       | Accuracy (200 epochs) |
-| ----------- | --------------------- |
-| ViT patch=4 | 98.5%                 |
+| Model        | Accuracy (400 epochs) |
+| ------------ | --------------------- |
+| ViT(patch=4) | 84.46%                |
+| ResNet18     |                       |
 
 ## References
 
