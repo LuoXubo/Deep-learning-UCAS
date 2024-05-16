@@ -37,7 +37,8 @@ python evaluate.py
 | ViT(patch=4) | 84.46%                |
 | ResNet18     | 93.87%                |
 | ViT_tiny     | 81.68%                |
-| ViT_small    | 89.68%                |
+| ViT_small    | 85.40%                |
+| Swin         | 94.00%                |
 
 ## References
 
