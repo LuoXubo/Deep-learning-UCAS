@@ -38,7 +38,7 @@ python evaluate.py
 | ResNet18     | 93.87%                |
 | ViT_tiny     | 81.68%                |
 | ViT_small    | 85.40%                |
-| Swin         | 94.00%                |
+| Swin         | 88.85%                |
 
 ## References
 
