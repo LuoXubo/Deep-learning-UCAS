@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-'''
-
-Train CIFAR10 with PyTorch and Vision Transformers!
-written by @kentaroy47, @arutema47
-
-'''
+"""
+@Description :  Train models on CIFAR10 
+@Author      :   Xubo Luo 
+@Time        :   2024/05/20 15:45:39
+"""
 
 from __future__ import print_function
 
