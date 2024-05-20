@@ -21,22 +21,15 @@ The model achieves an accuracy of 98.5% on the MNIST test dataset.
 To train the model, run the following command:
 
 ```
-python train.py
-```
+python train.py --net vit --epochs 200
 
-To evaluate the model, run the following command:
-
-```
-python evaluate.py
 ```
 
 # Results
 
 | Model        | Accuracy (400 epochs) |
 | ------------ | --------------------- |
-| ViT(patch=4) | 84.46%                |
-| ViT(patch=8) | 79.20%                |
-| ResNet18     | 93.87%                |
+| ViT(patch=8) | 84.46%                |
 | ViT_tiny     | 81.68%                |
 | ViT_small    | 85.40%                |
 | Swin         | 88.85%                |
