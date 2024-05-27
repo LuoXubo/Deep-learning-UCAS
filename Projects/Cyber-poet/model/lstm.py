@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class Model(nn.Module):
+class LSTM(nn.Module):
     '''
     input shape : seq_len , batch_size 
     output shape : seq_len , batch_size , vocab_size
@@ -46,4 +46,19 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
         unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(pred, target)
         weighted_loss = (unweighted_loss*weights)
         return weighted_loss.mean()
+
+
+if __name__ == '__main__':
+    model = LSTM(100, 64, 128)
+    input = torch.randint(0, 100, (10, 32))
+    output, hidden = model(input)
+    print(output.shape, hidden[0].shape, hidden[1].shape)
+    criterion = MaskedSoftmaxCELoss()
+    target = torch.randint(0, 100, (10, 32))
+    loss = criterion(output.permute(1, 2, 0), target.transpose(0, 1), 0)
+    print(loss.item())
+
+
+
+
 
