@@ -7,4 +7,4 @@ class Config():
     save_path = 'caches/'
     max_gen_len = 200
     model_path = None
-    epoch = 10
+    epoch = 100

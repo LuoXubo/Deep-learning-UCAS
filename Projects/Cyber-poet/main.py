@@ -55,11 +55,15 @@ def train(**kwargs):
                     str(avg_loss/100)
                 ))
                 avg_loss = 0
-            
-        torch.save(model.state_dict(), '%s%s_%s.pth' % (opt.save_path, \
-            time.strftime("[%Y-%m-%d-%H_%M_%S]", time.localtime(time.time())), epoch))
+        
+        if epoch % 5 == 0:
+            torch.save(model.state_dict(), '%s%s_%s.pth' % (opt.save_path, \
+                time.strftime("[%Y-%m-%d-%H_%M_%S]", time.localtime(time.time())), epoch))
 
-
+    torch.save(model.state_dict(), '%s%s_%s.pth' % (opt.save_path, \
+        time.strftime("[%Y-%m-%d-%H_%M_%S]", time.localtime(time.time())), epoch))
+    
+    
 def generate(model, start_words, prefix_word=None):
     _, word2ix, ix2word = get_data(opt)
     results = list(start_words)
