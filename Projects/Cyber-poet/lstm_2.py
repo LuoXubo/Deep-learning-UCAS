@@ -11,6 +11,8 @@ from torch import optim
 from torch.utils.data import DataLoader, Dataset
 # from torchnet import meter
 import random
+
+
 random.seed(20)
 torch.manual_seed(20)
 EMBEDDING_DIM = 512

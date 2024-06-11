@@ -1,100 +1,79 @@
 """
 @Description :   
 @Author      :   Xubo Luo 
-@Time        :   2024/05/28 10:09:43
+@Time        :   2024/06/10 20:38:19
 """
 
 import torch
-from config import Config
-from utils import get_data
-from torch.utils.data import DataLoader
-from model import Model, MaskedSoftmaxCELoss
-import torch.nn as nn
-from tqdm import tqdm
-import time
-from loguru import logger
+import random
+from utils import prepareData, generate, gen_acrostic, train
+from model.lstm import LSTM, DoubleLSTM
+import argparse
 
 
-opt = Config()
+random.seed(20)
+torch.manual_seed(20)
+EMBEDDING_DIM = 512
+HIDDEN_DIM = 1024
+LSTM_OUTDIM = 512
+LR = 0.001
+MAX_GEN_LEN = 200
+EPOCHS = 20
+DROP_PROB = 0.5
+LSTM_LAYER = 3
+BATCH_SIZE = 16
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_path', type=str, default='data/tang.npz')
+    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--epochs', type=int, default=20)
+    parser.add_argument('--model', type=str, default='DoubleLSTM', help='DoubleLSTM or LSTM')
+    parser.add_argument('--model_path', type=str, default=None, help='The path of the model. If you want to train the model, you can set it to None.')
+    args = parser.parse_args()
+
+    # Load data
+    print('-----------------------------------')
+    print('Loading data from %s ...'%args.data_path)
+    poem_loader, ix2word, word2ix = prepareData(args.data_path, args.batch_size)
+    print('Data loaded.')
+    print('-----------------------------------')
 
 
-def train(**kwargs):
-    for k, v in kwargs.items():
-        setattr(opt, k, v)
+    # Load model
+    print('-----------------------------------')
+    print('Loading %s ...'%args.model)
+    if args.model == 'DoubleLSTM':
+        model = DoubleLSTM(len(word2ix), EMBEDDING_DIM, HIDDEN_DIM)
+    else:
+        model = LSTM(len(word2ix), EMBEDDING_DIM, HIDDEN_DIM)
+    print('%s loaded.'%args.model)
+    print('-----------------------------------')
 
-    opt.device = torch.device('cuda') if opt.use_gpu else torch.device('cpu')
-    device = opt.device
-    data, word2ix, ix2word = get_data(opt)
-    data = torch.from_numpy(data)
-    dataloader = DataLoader(data, batch_size=opt.batch_size, shuffle=True)
-    model = Model(len(word2ix), 64, 128)
-    optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr)
-    criterion = MaskedSoftmaxCELoss()
-    if opt.model_path:
-        model.load_state_dict(torch.load(opt.model_path))
-    model.to(device)
+    # Train model
+    print('-----------------------------------')
+    print('Training ...')
+    if args.model_path is None:
+        train(args.model, model, args.epochs, poem_loader, word2ix, device)
+    print('Training finished.')
+    print('-----------------------------------')
 
-    avg_loss = 0
-    step = 0
-    for epoch in range(opt.epoch):
-        for ii, data_ in tqdm(enumerate(dataloader)):
-            data_ = data_.long().transpose(1, 0).contiguous()
-            data_ = data_.to(device)
-            optimizer.zero_grad()
-            input_, target = data_[:-1, :], data_[1:, :]
-            output, _ = model(input_)
-            loss = criterion.forward(output.permute(1, 2, 0), target.transpose(0, 1), \
-                                     word2ix['</s>'])
-            loss.backward()
-            optimizer.step()
-            step += 1
-            avg_loss += loss
-            if step % 100 == 0:
-                logger.info("{}\tEpoch: {}\tStep: {}\tLastLoss: {}\tAvgLoss: {}\t".format(
-                    time.strftime("[%Y-%m-%d-%H_%M_%S]", time.localtime(time.time())), epoch, step, str(loss.item()), \
-                    str(avg_loss/100)
-                ))
-                avg_loss = 0
-        
-        if epoch % 5 == 0:
-            torch.save(model.state_dict(), '%s%s_%s.pth' % (opt.save_path, \
-                time.strftime("[%Y-%m-%d-%H_%M_%S]", time.localtime(time.time())), epoch))
-
-    torch.save(model.state_dict(), '%s%s_%s.pth' % (opt.save_path, \
-        time.strftime("[%Y-%m-%d-%H_%M_%S]", time.localtime(time.time())), epoch))
+    # Load trained model
+    print('-----------------------------------')
+    model_path = 'caches/%s_%s.pth'%(args.model, args.epochs-1)
+    model = DoubleLSTM(len(word2ix), EMBEDDING_DIM, HIDDEN_DIM,)
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+    print('Load model from %s ...'%{model_path})
+    print('-----------------------------------')
     
-    
-def generate(model, start_words, prefix_word=None):
-    _, word2ix, ix2word = get_data(opt)
-    results = list(start_words)
-    start_word_len = len(start_words)
-    input = torch.Tensor([word2ix['<START>']]).view(1, 1).long()
-    if opt.use_gpu:
-        input = input.cuda()
-    hidden = None
 
-    if prefix_word:
-        for word in prefix_word:
-            output, hidden = model(input, hidden)
-            input = input.data.new([word2ix[word]]).view(1, 1)
+    results1 = generate(model, '花开花落几番时', ix2word, word2ix, device)
+    results2 = gen_acrostic(model, '深度学习', ix2word, word2ix)
 
-    for i in range(opt.max_gen_len):
-        output, hidden = model(input, hidden)
-
-        if i < start_word_len:
-            w = results[i]
-            input = input.data.new([word2ix[w]]).view(1, 1)
-        else:
-            top_index = output.data[0].topk(1)[1][0].item()
-            w = ix2word[top_index]
-            results.append(w)
-            input = input.data.new([top_index]).view(1, 1)
-        if w == "<EOP>":
-            del results[-1]
-            break
-    return results
-
-
-if __name__ == "__main__":
-    import fire 
-    fire.Fire()
+    print('The generated result with first line: 花开花落几番时')
+    print(' '.join(i for i in results1))
+    print('-----------------------------------')
+    print('The generated result with first line: 深度学习')
+    print(' '.join(i for i in results2))

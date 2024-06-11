@@ -8,11 +8,22 @@ This repository contains the course projects of the deep learning of UCAS. The p
 
 ## 2. Projects
 
+### Done
+
 - [Digit recognition](Projects/Digit-recognition/README.md)
-- [Image classification](Projects/ViT-CIFAR10-classification/README.md)
+- [Image classification](Projects\Digit-recognition\README.md)
+
+### In progress
+
+- [Auto Poetry Generation](Projects\Cyber-poet\README.md)
+
+### TODO
+
+- [Auto Translation](Projects/Translation/README.md)
 - [Object detection](Projects/Object-detection/README.md)
-- [Image segmentation](Projects/Image-segmentation/README.md)
-- [Text classification](Projects/Text-classification/README.md)
+- [Street Segmentation](Projects/Street-segmentation/README.md)
+- [Language model](Projects/Language-model/README.md)
+- [Image description](Projects/Image-description/README.md)
 
 ## 3. Environment
 
