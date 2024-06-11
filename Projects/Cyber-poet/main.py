@@ -7,9 +7,10 @@
 import torch
 import random
 from utils import prepareData, generate, gen_acrostic, train
-from model.lstm import LSTM, DoubleLSTM
+from model import LSTM, DoubleLSTM
 import argparse
-
+import os
+# os.path.abspath(os.path.dirname(__file__))
 
 random.seed(20)
 torch.manual_seed(20)
@@ -27,7 +28,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_path', type=str, default='data/tang.npz')
+    parser.add_argument('--data_path', type=str, default='../../Dataset/tang.npz')
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--model', type=str, default='DoubleLSTM', help='DoubleLSTM or LSTM')
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     
 
     results1 = generate(model, '花开花落几番时', ix2word, word2ix, device)
-    results2 = gen_acrostic(model, '深度学习', ix2word, word2ix)
+    results2 = gen_acrostic(model, '深度学习', ix2word, word2ix, device)
 
     print('The generated result with first line: 花开花落几番时')
     print(' '.join(i for i in results1))
