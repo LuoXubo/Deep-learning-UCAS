@@ -71,10 +71,10 @@ if __name__ == '__main__':
     
 
     results1 = generate(model, '花开花落几番时', ix2word, word2ix, device)
-    results2 = gen_acrostic(model, '深度学习', ix2word, word2ix, device)
+    results2 = gen_acrostic(model, '毕业快乐', ix2word, word2ix, device)
 
     print('The generated result with first line: 花开花落几番时')
     print(' '.join(i for i in results1))
     print('-----------------------------------')
-    print('The generated result with first line: 深度学习')
+    print('The generated result with first line: 毕业快乐')
     print(' '.join(i for i in results2))
