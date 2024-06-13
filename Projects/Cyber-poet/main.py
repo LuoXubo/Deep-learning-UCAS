@@ -70,11 +70,29 @@ if __name__ == '__main__':
     print('-----------------------------------')
     
 
-    results1 = generate(model, '花开花落几番时', ix2word, word2ix, device)
+    results1 = generate(model, '朝辞白帝彩云间', ix2word, word2ix, device)
     results2 = gen_acrostic(model, '毕业快乐', ix2word, word2ix, device)
 
-    print('The generated result with first line: 花开花落几番时')
-    print(' '.join(i for i in results1))
+    print('The generated result with first line: 朝辞白帝彩云间')
+    print(results1)
     print('-----------------------------------')
     print('The generated result with first line: 毕业快乐')
-    print(' '.join(i for i in results2))
+    print(results2)
+
+    print('-----------------------------------')
+
+    caches = ['caches/DoubleLSTM_0.pth', 'caches/DoubleLSTM_5.pth', 'caches/DoubleLSTM_10.pth', 'caches/DoubleLSTM_15.pth', 'caches/DoubleLSTM_19.pth']
+    with open('generated_poems.txt', 'w') as f:
+        
+        for cache in caches:
+            # model = DoubleLSTM(len(word2ix), EMBEDDING_DIM, HIDDEN_DIM,)
+            model.load_state_dict(torch.load(cache, map_location=torch.device('cpu')))
+            results1 = generate(model, '朝辞白帝彩云间', ix2word, word2ix, device)
+            # results2 = gen_acrostic(model, '毕业快乐', ix2word, word2ix, device)
+            print('The generated result with model %s'%cache)
+            print(results1)
+            print('-----------------------------------')
+            f.write('model %s: \n'%cache)
+            f.write(results1)
+            f.write('\n-----------------------------------\n')
+    f.close()

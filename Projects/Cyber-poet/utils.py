@@ -113,7 +113,9 @@ def generate(model, start_words, ix2word, word2ix, device):
         if w == '<EOP>':
             del results[-1]
             break
-    return results
+    post_res = ' '.join(i for i in results)
+
+    return post_res
 
 def gen_acrostic(model, start_words, ix2word, word2ix, device):
     """
@@ -149,7 +151,10 @@ def gen_acrostic(model, start_words, ix2word, word2ix, device):
             input = (input.data.new([top_index])).view(1, 1)
         result.append(w)
         pre_word = w
-    return result
+    
+    post_res = ' '.join(i for i in result)
+
+    return post_res
 
 def train(model_name, model, epochs, poem_loader, word2ix, device):
     """
