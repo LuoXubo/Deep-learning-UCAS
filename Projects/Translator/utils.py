@@ -21,6 +21,10 @@ import time
 import jieba
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 
+import nltk
+nltk.download('punkt')
+nltk.download('words')
+
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'  # 下面老是报错 shape 不一致
 
 class TranslationDataset(Dataset):
