@@ -514,6 +514,7 @@ def compute_bleu4(tokenizer, random_integers, model, device):
     with torch.no_grad():
         # 预测
         y = predict(x, model, tokenizer, device)
+        print(y)
     # 这个p用于记录y的索引
     p = 0
     # 用于保存有效的索引

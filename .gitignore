@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 
 /Dataset/
+Projects/Translator/model
+Projects/Digit-recognition/caches
+Projects/ViT-CIFAR10-classification/caches
