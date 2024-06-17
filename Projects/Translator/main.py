@@ -10,9 +10,10 @@ import tqdm
 import argparse
 import os
 
-root_path = r'../../Dataset/sample/sample-submission-version/TM-training-set/'
-ch_path = root_path + 'chinese.txt'
-en_path = root_path + 'english.txt'
+# root_path = r'../../Dataset/sample/sample-submission-version/TM-training-set/'
+root_path = r'../../Dataset/'
+ch_path = root_path + 'tgt.txt'
+en_path = root_path + 'src.txt'
 
 
 # 训练
