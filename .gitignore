@@ -163,3 +163,5 @@ cython_debug/
 Projects/Translator/model
 Projects/Digit-recognition/caches
 Projects/ViT-CIFAR10-classification/caches
+
+Projects\Translator\save
