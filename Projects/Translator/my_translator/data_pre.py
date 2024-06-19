@@ -51,6 +51,7 @@ class PrepareData:
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip().split('\t')
+                # line = line.strip().split(' ')
 
                 en.append(["BOS"] + word_tokenize(line[0].lower()) + ["EOS"])
                 cn.append(["BOS"] + word_tokenize(" ".join([w for w in line[1]])) + ["EOS"])
