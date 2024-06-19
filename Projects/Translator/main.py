@@ -12,8 +12,10 @@ import os
 
 # root_path = r'../../Dataset/sample/sample-submission-version/TM-training-set/'
 root_path = r'../../Dataset/'
-ch_path = root_path + 'tgt.txt'
-en_path = root_path + 'src.txt'
+# ch_path = root_path + 'tgt.txt'
+# en_path = root_path + 'src.txt'
+ch_path = 'tgt.txt'
+en_path = 'src.txt'
 
 
 # 训练
@@ -55,12 +57,13 @@ def train(model_path='./model/translation_99.pt', epochs=100, device='cuda'):
             out = lossF(out, batch.trg_y, batch.ntokens)
             if (p+1) % 1000 == 0:
                 model.eval()
-                print('epoch', epoch, 'loss', float(out / batch.ntokens))
+                # print('epoch', epoch, 'loss', float(out / batch.ntokens))
                 model.train()
-                print('time', time.time() - t)
+                # print('time', time.time() - t)
                 if float(out / batch.ntokens)<2.2:
                     random_integers = random.sample(range(len(tokenizer.test)), 100)
-                    # nu=compute_bleu4(tokenizer, random_integers, model, device)
+                    nu=compute_bleu4(tokenizer, random_integers, model, device)
+                    print('batch: ', p, '   bleu4: ', nu)
 
             p+=1
         if epoch % 10 == 0 or epoch == epochs - 1:
@@ -89,7 +92,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser() 
     parser.add_argument('--train', type=bool, default=True)
     parser.add_argument('--eval', type=bool, default=True)
-    parser.add_argument('--model_path', type=str, default='./model/translation_99.pt')
+    parser.add_argument('--model_path', type=str, default='./model/translation_199.pt')
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--device', type=str, default='cuda')
 
@@ -100,4 +103,5 @@ if __name__ == '__main__':
     if args.train:
         train(model_path=args.model_path, epochs=args.epochs, device=args.device)
     if args.eval:
-        eval(model_path=args.model_path, device=args.device)
+        model_path = '/model/translation_%n.pt'%(args.epochs-1)
+        eval(model_path=model_path, device=args.device)
